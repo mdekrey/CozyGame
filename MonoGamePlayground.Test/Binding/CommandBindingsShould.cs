@@ -15,7 +15,7 @@ public class CommandBindingsShould
         floatBinding.Setup(mock => mock.CreateValueLambda()).Returns((LambdaExpression)(() => 0f));
 
         // Act
-        var target = new Mutate<float, float>(floatBinding.Object, (float v) => v + 1);
+        var target = new Mutate<float, float>(floatBinding.Object, v => v + 1);
 
         // Assert
         var compiled = (Func<float>)target.CreateValueLambda().Compile();
