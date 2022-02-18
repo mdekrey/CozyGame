@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using Microsoft.Xna.Framework.Input;
+using MonoGamePlayground.Binding;
 
 namespace MonoGamePlayground.Binding;
 
@@ -39,35 +39,10 @@ static class MutateBuilder
     }
 }
 
-public record Mutate<T1, TOut>(Binding<T1> Binding1, Func<T1, TOut> Combine) : Binding<TOut>
+public record BindingCombination<TOut>(Delegate Combine, params IBinding[] Bindings) : Binding<TOut>
 {
     public override LambdaExpression CreateValueLambda()
     {
-        return MutateBuilder.Build(Combine, Binding1.CreateValueLambda());
+        return MutateBuilder.Build(Combine, Bindings.Select(b => b.CreateValueLambda()).ToArray());
     }
 }
-public record Mutate<T1, T2, TOut>(Binding<T1> Binding1, Binding<T2> Binding2, Func<T1, T2, TOut> Combine) : Binding<TOut>
-{
-    public override LambdaExpression CreateValueLambda()
-    {
-        return MutateBuilder.Build(Combine, Binding1.CreateValueLambda(), Binding2.CreateValueLambda());
-    }
-}
-
-public record Mutate<T1, T2, T3, TOut>(Binding<T1> Binding1, Binding<T2> Binding2, Binding<T3> Binding3, Func<T1, T2, T3, TOut> Combine) : Binding<TOut>
-{
-    public override LambdaExpression CreateValueLambda()
-    {
-        return MutateBuilder.Build(Combine, Binding1.CreateValueLambda(), Binding2.CreateValueLambda(), Binding3.CreateValueLambda());
-    }
-}
-
-public record Mutate<T1, T2, T3, T4, TOut>(Binding<T1> Binding1, Binding<T2> Binding2, Binding<T3> Binding3, Binding<T4> Binding4, Func<T1, T2, T3, T4, TOut> Combine) : Binding<TOut>
-{
-    public override LambdaExpression CreateValueLambda()
-    {
-        return MutateBuilder.Build(Combine, Binding1.CreateValueLambda(), Binding2.CreateValueLambda(), Binding3.CreateValueLambda(), Binding4.CreateValueLambda());
-    }
-}
-
-// record ToEvent(Binding<bool> Target, bool WhenChangesTo) : Binding<EventUnit>;

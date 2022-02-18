@@ -3,7 +3,14 @@ using Microsoft.Xna.Framework.Input;
 
 namespace MonoGamePlayground.Binding;
 
-public abstract record Binding<T>()
+public interface IBinding
 {
+    System.Type ReturnType { get; }
+    LambdaExpression CreateValueLambda();
+}
+
+public abstract record Binding<T>() : IBinding
+{
+    public System.Type ReturnType => typeof(T);
     public abstract LambdaExpression CreateValueLambda();
 }
