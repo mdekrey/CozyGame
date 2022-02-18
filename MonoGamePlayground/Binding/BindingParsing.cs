@@ -45,17 +45,30 @@ public class BindingParsing
         typeof(Func<,,,,,,,,,,,,,,,,>),
     };
 
-    public async Task<Bindings> Parse(string config)
+    public async Task<Bindings> Parse(string config, CommandSet commandSet, InputState inputState)
+    {
+        return await ExtractBindingsFromParsed(commandSet, inputState, ParseYaml(config));
+    }
+
+    public static Dictionary<string, Dictionary<string, object>> ParseYaml(string config)
     {
         var deserializer = new YamlDotNet.Serialization.DeserializerBuilder()
-            .Build();
+                    .Build();
         using var sr = new StringReader(config);
         var result = deserializer.Deserialize<Dictionary<string, Dictionary<string, object>>>(sr);
+        return result;
+    }
 
+    public async Task<Bindings> ExtractBindingsFromParsed(CommandSet commandSet, InputState inputState, Dictionary<string, Dictionary<string, object>> result)
+    {
         return new Bindings(
-            new Dictionary<string, IBinding>(
-                await Task.WhenAll(result.Select(async kvp => new KeyValuePair<string, IBinding>(kvp.Key, await ParseBinding(kvp.Value))))
-            )
+            new Dictionary<BindableCommand, IBinding>(
+                await Task.WhenAll(
+                    commandSet
+                        .Select(async command => new KeyValuePair<BindableCommand, IBinding>(command, await ParseBinding(result[command.Name])))
+                )
+            ),
+            inputState
         );
     }
 
@@ -73,7 +86,8 @@ public class BindingParsing
         var subBindings = await Task.WhenAll(subBindingTrees.Select(ParseBinding));
         var baseType = funcTypes[subBindings.Length];
         var delegateType = baseType.MakeGenericType(subBindings.Select(b => b.ReturnType).Concat(new[] { typeof(T) }).ToArray());
-        var combiner = (Delegate)await scriptParser.EvaluateAsync(expression, delegateType);
+        var combiner = (Delegate?)await scriptParser.EvaluateAsync(expression, delegateType);
+        System.Diagnostics.Debug.Assert(combiner != null);
         return new BindingCombination<T>(combiner, subBindings);
     }
     
