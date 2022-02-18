@@ -18,6 +18,42 @@ public class BindingParsingShould
     }
 
     [Fact]
+    public async Task HandlePlayer1KeyboardState()
+    {
+        var (parsedBindings, exitCommand, inputState) = await SetupCombinedExitCommand();
+        inputState.KeyboardState = new KeyboardState(Keys.Escape);
+        inputState.Update();
+
+        // Assert
+        var exitResult = parsedBindings.GetValue(0, exitCommand);
+        Assert.True(exitResult);
+    }
+    
+    [Fact]
+    public async Task HandlePlayer2KeyboardState()
+    {
+        var (parsedBindings, exitCommand, inputState) = await SetupCombinedExitCommand();
+        inputState.KeyboardState = new KeyboardState(Keys.Delete);
+        inputState.Update();
+
+        // Assert
+        var exitResult = parsedBindings.GetValue(1, exitCommand);
+        Assert.True(exitResult);
+    }
+    
+    [Fact]
+    public async Task HandleSeparatePlayerKeyboardState()
+    {
+        var (parsedBindings, exitCommand, inputState) = await SetupCombinedExitCommand();
+        inputState.KeyboardState = new KeyboardState(Keys.Escape);
+        inputState.Update();
+
+        // Assert
+        var exitResult = parsedBindings.GetValue(1, exitCommand);
+        Assert.False(exitResult);
+    }
+
+    [Fact]
     public async Task HandlePlayer1GamepadState()
     {
         var (parsedBindings, exitCommand, inputState) = await SetupCombinedExitCommand();
@@ -63,7 +99,9 @@ public class BindingParsingShould
                 combineToBoolean:
                     - '(a, b) => a || b'
                     - gamepadButton: Back
-                    - keyboard: Escape
+                    - perPlayerKeyboard: 
+                        - Escape
+                        - Delete
         ";
         var exitCommand = new BooleanStateCommand("exit");
         var commandSet = new CommandSet(new[] { exitCommand });

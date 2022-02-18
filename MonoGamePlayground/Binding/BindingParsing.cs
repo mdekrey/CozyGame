@@ -22,6 +22,11 @@ public class BindingParsing
         },
         ["gamepadButton"] = (fromYaml, parsing) => Task.FromResult(GamepadButton((string)fromYaml)),
         ["keyboard"] = (fromYaml, parsing) => Task.FromResult(Keyboard((string)fromYaml)),
+        ["perPlayerKeyboard"] = (fromYaml, parsing) =>
+        {
+            var arr = (IReadOnlyList<object>)fromYaml;
+            return Task.FromResult(PerPlayerKeyboard(arr.Cast<string>().ToArray()));
+        },
     };
     private static readonly ScriptedLambda scriptParser = new();
     private static readonly IReadOnlyList<Type> funcTypes = new[]
@@ -101,5 +106,10 @@ public class BindingParsing
     private static IBinding Keyboard(string key)
     {
         return new Xna.KeyboardButtonBinding(Enum.Parse<Microsoft.Xna.Framework.Input.Keys>(key));
+    }
+
+    private static IBinding PerPlayerKeyboard(string[] keysByPlayer)
+    {
+        return new Xna.PerPlayerKeyboardBinding(keysByPlayer.Select(key => Enum.Parse<Microsoft.Xna.Framework.Input.Keys>(key)).ToArray());
     }
 }

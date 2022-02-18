@@ -3,14 +3,6 @@ using System.Linq.Expressions;
 using Microsoft.Xna.Framework.Input;
 
 namespace MonoGamePlayground.Binding.Xna;
-
-record KeyboardButtonBinding(Keys Key) : Binding<bool>
-{
-    public override LambdaExpression CreateValueLambda()
-    {
-        return (KeyboardState state) => state.IsKeyDown(Key);
-    }
-}
 enum MouseButton
 {
     Left,

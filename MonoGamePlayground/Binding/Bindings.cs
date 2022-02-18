@@ -90,6 +90,8 @@ class ReplaceParamsInputStateVisitor : ExpressionVisitor
             return Call(inputState, nameof(InputState.GetMouseState), null);
         if (type == typeof(GamePadState))
             return Call(inputState, nameof(InputState.GetGamePadState), null, playerIndex);
+        if (type == typeof(int))
+            return playerIndex;
 
         return base.VisitParameter(node);
     }
