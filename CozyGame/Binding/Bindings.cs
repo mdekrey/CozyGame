@@ -9,7 +9,7 @@ using static System.Linq.Expressions.Expression;
 
 namespace CozyGame.Binding;
 
-public class Bindings
+public class Bindings : ICommandOutput
 {
     private readonly IReadOnlyDictionary<BindableCommand, IBinding> dictionary;
     private readonly InputState inputState;
