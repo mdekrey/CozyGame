@@ -11,9 +11,10 @@ public class BindingParsingShould
     public async Task HandleDefaultState()
     {
         var (parsedBindings, exitCommand, _) = await SetupCombinedExitCommand();
+        parsedBindings.UpdateOutputs();
 
         // Assert
-        var exitResult = parsedBindings.GetValue(0, exitCommand);
+        var exitResult = parsedBindings.GetOutput(0, exitCommand);
         Assert.False(exitResult);
     }
 
@@ -23,9 +24,10 @@ public class BindingParsingShould
         var (parsedBindings, exitCommand, inputState) = await SetupCombinedExitCommand();
         inputState.KeyboardState = new KeyboardState(Keys.Escape);
         inputState.Update();
+        parsedBindings.UpdateOutputs();
 
         // Assert
-        var exitResult = parsedBindings.GetValue(0, exitCommand);
+        var exitResult = parsedBindings.GetOutput(0, exitCommand);
         Assert.True(exitResult);
     }
     
@@ -35,9 +37,10 @@ public class BindingParsingShould
         var (parsedBindings, exitCommand, inputState) = await SetupCombinedExitCommand();
         inputState.KeyboardState = new KeyboardState(Keys.Delete);
         inputState.Update();
+        parsedBindings.UpdateOutputs();
 
         // Assert
-        var exitResult = parsedBindings.GetValue(1, exitCommand);
+        var exitResult = parsedBindings.GetOutput(1, exitCommand);
         Assert.True(exitResult);
     }
     
@@ -47,9 +50,10 @@ public class BindingParsingShould
         var (parsedBindings, exitCommand, inputState) = await SetupCombinedExitCommand();
         inputState.KeyboardState = new KeyboardState(Keys.Escape);
         inputState.Update();
+        parsedBindings.UpdateOutputs();
 
         // Assert
-        var exitResult = parsedBindings.GetValue(1, exitCommand);
+        var exitResult = parsedBindings.GetOutput(1, exitCommand);
         Assert.False(exitResult);
     }
 
@@ -59,9 +63,10 @@ public class BindingParsingShould
         var (parsedBindings, exitCommand, inputState) = await SetupCombinedExitCommand();
         inputState.GamePadState[0] = new GamePadState(Vector2.Zero, Vector2.Zero, 0, 0, Buttons.Back);
         inputState.Update();
+        parsedBindings.UpdateOutputs();
 
         // Assert
-        var exitResult = parsedBindings.GetValue(0, exitCommand);
+        var exitResult = parsedBindings.GetOutput(0, exitCommand);
         Assert.True(exitResult);
     }
 
@@ -71,9 +76,10 @@ public class BindingParsingShould
         var (parsedBindings, exitCommand, inputState) = await SetupCombinedExitCommand();
         inputState.GamePadState[0] = new GamePadState(Vector2.Zero, Vector2.Zero, 0, 0, Buttons.Back);
         inputState.Update();
+        parsedBindings.UpdateOutputs();
 
         // Assert
-        var exitResult = parsedBindings.GetValue(1, exitCommand);
+        var exitResult = parsedBindings.GetOutput(1, exitCommand);
         Assert.False(exitResult);
     }
 
@@ -83,15 +89,15 @@ public class BindingParsingShould
         var (parsedBindings, exitCommand, inputState) = await SetupCombinedExitCommand();
         inputState.GamePadState[1] = new GamePadState(Vector2.Zero, Vector2.Zero, 0, 0, Buttons.Back);
         inputState.Update();
+        parsedBindings.UpdateOutputs();
 
         // Assert
-        var exitResult = parsedBindings.GetValue(1, exitCommand);
+        var exitResult = parsedBindings.GetOutput(1, exitCommand);
         Assert.True(exitResult);
     }
 
     private static async Task<(Bindings parsedBindings, BooleanStateCommand exitCommand, InputStateStubs inputState)> SetupCombinedExitCommand()
     {
-
         // Arrange
         var target = new BindingParsing();
         var script = @"

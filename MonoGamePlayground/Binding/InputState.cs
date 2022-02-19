@@ -5,7 +5,7 @@ namespace MonoGamePlayground.Binding;
 
 public class InputState
 {
-    private readonly int maximumGamepads;
+    public int MaximumPlayers { get; }
     private readonly Func<KeyboardState> getKeyboardState;
     private readonly Func<int, GamePadState> getGamePadState;
     private readonly Func<MouseState> getMouseState;
@@ -23,7 +23,8 @@ public class InputState
 
     public InputState(int maximumGamepads, Func<KeyboardState> getKeyboardState, Func<int, GamePadState> getGamePadState, Func<MouseState> getMouseState)
     {
-        this.maximumGamepads = maximumGamepads;
+        // TODO: This assumes every player has their own gamepad. Some may only have keyboard, etc.
+        this.MaximumPlayers = maximumGamepads;
         this.getKeyboardState = getKeyboardState;
         this.getGamePadState = getGamePadState;
         this.getMouseState = getMouseState;
@@ -39,7 +40,6 @@ public class InputState
     public MouseState GetPreviousMouseState() => previousMouseState;
     public MouseState GetMouseState() => mouseState;
 
-
     public void Update()
     {
         // Copy current state to previous state
@@ -50,7 +50,7 @@ public class InputState
         // Get new state
         keyboardState = getKeyboardState();
         mouseState = getMouseState();
-        for (var i = 0; i < maximumGamepads; i++)
+        for (var i = 0; i < MaximumPlayers; i++)
             gamePadState[i] = getGamePadState(i);
     }
 }

@@ -14,20 +14,38 @@ public class Bindings
     private readonly IReadOnlyDictionary<BindableCommand, IBinding> dictionary;
     private readonly InputState inputState;
     private readonly ConcurrentDictionary<BindableCommand, Func<InputState, int, object>> commandResolvers = new();
+    private readonly Dictionary<OutputStateKey, object> outputStates;
 
     public Bindings(Dictionary<BindableCommand, IBinding> dictionary, InputState inputState)
     {
         this.dictionary = dictionary;
         this.inputState = inputState;
+        this.outputStates = new Dictionary<OutputStateKey, object>(dictionary.Count * inputState.MaximumPlayers);
+
+        foreach (var command in dictionary.Keys)
+        {
+            commandResolvers.GetOrAdd(command, CompileCommand);
+        }
     }
 
     public InputState InputState => inputState;
 
-    public T GetValue<T>(int playerIndex, BindableCommand<T> command)
+    public void UpdateOutputs()
     {
-        var compiled = commandResolvers.GetOrAdd(command, CompileCommand);
-        var result = compiled(inputState, playerIndex);
-        return (T)result;
+        for (var playerIndex = 0; playerIndex < inputState.MaximumPlayers; playerIndex++)
+        {
+            foreach (var command in dictionary.Keys)
+            {
+                var compiled = commandResolvers.GetOrAdd(command, CompileCommand);
+                var result = compiled(inputState, playerIndex);
+                outputStates[new OutputStateKey(playerIndex, command)] = result;
+            }
+        }
+    }
+
+    public T GetOutput<T>(int playerIndex, BindableCommand<T> command)
+    {
+        return (T)outputStates[new OutputStateKey(playerIndex, command)];
     }
 
     private Func<InputState, int, object> CompileCommand(BindableCommand command)
@@ -49,6 +67,8 @@ public class Bindings
             playerIndex
         ).Compile();
     }
+
+    private record struct OutputStateKey(int PlayerIndex, BindableCommand Command);
 }
 
 class ReplaceParamsInputStateVisitor : ExpressionVisitor
