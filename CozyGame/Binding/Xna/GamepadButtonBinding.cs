@@ -3,10 +3,10 @@ using Microsoft.Xna.Framework.Input;
 
 namespace CozyGame.Binding.Xna;
 
-public record KeyboardButtonBinding(Keys Key) : Binding<bool>
+public record GamepadButtonBinding(Buttons Button) : Binding<bool>
 {
     public override LambdaExpression CreateValueLambda()
     {
-        return (KeyboardState state) => state.IsKeyDown(Key);
+        return (GamePadState state) => state.IsButtonDown(Button);
     }
 }
