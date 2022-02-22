@@ -55,10 +55,10 @@ public class GamepadAxisBindingShould
         parsedBindings.UpdateOutputs();
     }
 
-    private static (Bindings parsedBindings, NumberStateCommand xCommand, InputStateStubs inputState) SetupExitCommand(GamepadAxis axis)
+    private static (Bindings parsedBindings, NumberCommand xCommand, InputStateStubs inputState) SetupExitCommand(GamepadAxis axis)
     {
         // Arrange
-        var xCommand = new NumberStateCommand("x");
+        var xCommand = new NumberCommand("x");
         var inputStateStubs = new InputStateStubs(2);
         var inputState = inputStateStubs.InputState;
 
